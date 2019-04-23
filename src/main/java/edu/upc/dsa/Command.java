@@ -1,4 +1,5 @@
 package edu.upc.dsa;
 
-public class Command {
+public interface Command {
+    String execute();
 }
