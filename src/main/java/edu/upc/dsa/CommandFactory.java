@@ -1,14 +1,17 @@
 package edu.upc.dsa;
 
+import org.apache.log4j.Logger;
+
 import java.util.HashMap;
 
 public class CommandFactory {
 
+    final static Logger log = Logger.getLogger(CommandFactory.class.getName());
     private static CommandFactory instance;
-    private HashMap<String, Command> commands;
+    private HashMap<String, Command> cache;
 
     private CommandFactory() {
-        this.commands = new HashMap<String, Command>();
+        this.cache = new HashMap<String, Command>();
     }
 
     public static CommandFactory getInstance(){
@@ -16,19 +19,24 @@ public class CommandFactory {
         return instance;
     }
 
-    public static Command getCommand(String name) {
-        Command command = null;
-        if (name.equals("C1")) command = new C1();
-        else command new C2();
+    public Command getCommand(String name) {
+        Command command = this.cache.get(name);
+        if (command == null) {
+            log.info("Load " + name);
+            command = getCommand2(name);
+            this.cache.put(name, command);
+        } else {
+            log.info("In cache");
+        }
         return command;
     }
 
-    public static Command getCommand2(String name) {
+    public Command getCommand2(String name) {
         Command command = null;
-        Class c = null;
+        Class aClass = null;
         try {
-            c = Class.forName("edu.upc.dsa" + name);
-            command = (Command) c.newInstance();
+            aClass = Class.forName("edu.upc.dsa." + name);
+            command = (Command) aClass.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
